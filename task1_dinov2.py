@@ -111,10 +111,10 @@ def compute_mahalanobis(query_embedding: np.ndarray,
 # ──────────────────────────────────────────────
 def normalize_score(distance: float) -> float:
     """Map pseudo-inverse Mahalanobis distance to [0, 1].
-       Typical inliers have distances ~12-16.
+       Typical inliers have distances ~12-30.
     """
-    shifted_dist = max(0.0, distance - 14.0)
-    score = 1.0 - np.exp(-shifted_dist / 10.0)
+    shifted_dist = max(0.0, distance - 20.0)
+    score = 1.0 - np.exp(-shifted_dist / 25.0)
     return round(float(score), 4)
 
 
