@@ -98,21 +98,23 @@ def compute_mahalanobis(query_embedding: np.ndarray,
                         baseline_embeddings: np.ndarray) -> float:
     mean_vec = np.mean(baseline_embeddings, axis=0)
     cov = np.cov(baseline_embeddings.T)
-    cov += np.eye(cov.shape[0]) * 1e-4        # regularize
-    cov_inv = np.linalg.inv(cov)
-    distance = mahalanobis(query_embedding, mean_vec, cov_inv)
+    # Using pseudo-inverse to handle the curse of dimensionality (samples < dims)
+    cov_pinv = np.linalg.pinv(cov, rcond=1e-5)
+    
+    diff = query_embedding - mean_vec
+    distance = np.sqrt(diff.T @ cov_pinv @ diff)
     return float(distance)
 
 
 # ──────────────────────────────────────────────
 # 6. NORMALIZE TO 0–1 OUTLIER SCORE
 # ──────────────────────────────────────────────
-def normalize_score(distance: float, scale: float = 25.0) -> float:
-    """Map raw Mahalanobis distance to [0, 1] via exponential saturation.
-       0.0 = normal (distance ≈ 0)
-       1.0 = extreme outlier (distance >> scale)
+def normalize_score(distance: float) -> float:
+    """Map pseudo-inverse Mahalanobis distance to [0, 1].
+       Typical inliers have distances ~12-16.
     """
-    score = 1.0 - np.exp(-distance / scale)
+    shifted_dist = max(0.0, distance - 14.0)
+    score = 1.0 - np.exp(-shifted_dist / 10.0)
     return round(float(score), 4)
 
 
