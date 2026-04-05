@@ -1,0 +1,22 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environments
+.venv/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Datasets and large baseline files
+dataset/
+baseline_data/
+*.npy
+*.pt
+
+# Example images
+*.jpg
+*.jpeg
+*.png
